@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:kulineran/components/widgets/loading_indicator.dart';
 import 'package:kulineran/components/widgets/post_card.dart';
 import 'package:kulineran/components/widgets/kulineran_logo.dart';
@@ -52,6 +53,26 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
+  double _calculateScore(Map<String, dynamic> post, Position? currentPosition) {
+    final likes = (post['likeCount'] ?? post['favoriteCount'] ?? 0) as num;
+    if (currentPosition == null) {
+      return likes.toDouble();
+    }
+    final lat = post['latitude'] as double?;
+    final lon = post['longitude'] as double?;
+    if (lat == null || lon == null) {
+      return likes.toDouble();
+    }
+    final distanceMeters = Geolocator.distanceBetween(
+      currentPosition.latitude,
+      currentPosition.longitude,
+      lat,
+      lon,
+    );
+    final distanceKm = distanceMeters / 1000.0;
+    return (likes + 1) / (distanceKm + 1);
+  }
+
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
@@ -84,18 +105,37 @@ class _HomeScreenState extends State<HomeScreen> {
             );
           }
 
+          final sortedPosts = List<Map<String, dynamic>>.from(posts);
+          sortedPosts.sort((a, b) {
+            final scoreA = _calculateScore(a, _currentPosition);
+            final scoreB = _calculateScore(b, _currentPosition);
+            if (scoreA != scoreB) {
+              return scoreB.compareTo(scoreA); // Descending score
+            }
+            // Fallback: createdAt descending
+            final timeA = a['createdAt'];
+            final timeB = b['createdAt'];
+            if (timeA == null && timeB == null) return 0;
+            if (timeA == null) return 1;
+            if (timeB == null) return -1;
+            
+            DateTime dtA = timeA is Timestamp ? timeA.toDate() : DateTime.tryParse(timeA.toString()) ?? DateTime(0);
+            DateTime dtB = timeB is Timestamp ? timeB.toDate() : DateTime.tryParse(timeB.toString()) ?? DateTime(0);
+            return dtB.compareTo(dtA);
+          });
+
           return ListView.builder(
             padding: const EdgeInsets.only(top: 16, bottom: 24),
-            itemCount: posts.length,
+            itemCount: sortedPosts.length,
             itemBuilder: (context, index) {
               return PostCard(
-                post: posts[index],
+                post: sortedPosts[index],
                 userLat: _currentPosition?.latitude,
                 userLon: _currentPosition?.longitude,
                 onTap: () => Navigator.pushNamed(
                   context,
                   '/detail',
-                  arguments: posts[index],
+                  arguments: sortedPosts[index],
                 ),
               );
             },

@@ -450,7 +450,19 @@ class _PostCardState extends State<PostCard> {
             ],
           ),
           
-          const SizedBox(height: 12),
+          const SizedBox(height: 8),
+          
+          // Likes Count Text
+          Text(
+            _likeCount == 1 ? "1 like" : "$_likeCount likes",
+            style: TextStyle(
+              color: isDark ? Colors.white : Colors.black,
+              fontWeight: FontWeight.bold,
+              fontSize: 14,
+            ),
+          ),
+          
+          const SizedBox(height: 8),
           
           // Caption Description (Username : Description)
           Builder(
