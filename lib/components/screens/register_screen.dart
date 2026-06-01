@@ -28,7 +28,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
     setState(() => _isGoogleLoading = true);
     try {
       await AuthService().signInWithGoogle();
-      // AuthGate will handle navigation on successful sign-in
+        // AuthGate will handle navigation on successful sign-in
     } catch (e) {
       if (mounted) {
         final msg = e.toString();

@@ -592,6 +592,15 @@ class _AddPostScreenState extends State<AddPostScreen> {
                                         ),
                                       ),
                                     ),
+                                    if (_isLoadingLocation)
+                                      Container(
+                                        color: Colors.black.withOpacity(0.3),
+                                        child: const Center(
+                                          child: CircularProgressIndicator(
+                                            color: Color(0xFFFF7260),
+                                          ),
+                                        ),
+                                      ),
                                   ],
                                 ),
                     ),

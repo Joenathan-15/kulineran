@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:kulineran/auth_gate.dart';
+import 'package:kulineran/components/screens/detail_screen.dart';
 import 'package:kulineran/components/screens/splash_screen.dart';
 import 'package:kulineran/components/screens/onboarding_screen.dart';
 import 'package:kulineran/components/screens/login_screen.dart';
@@ -55,6 +56,15 @@ class KulineranApp extends StatelessWidget {
         "/search": (context) => const SearchScreen(),
         "/favorites": (context) => const FavoritesScreen(),
         "/profile": (context) => const ProfileScreen(),
+      },
+      onGenerateRoute: (settings) {
+        if (settings.name == '/detail') {
+          final post = settings.arguments as Map<String, dynamic>;
+          return MaterialPageRoute(
+            builder: (context) => DetailScreen(post: post),
+          );
+        }
+        return null;
       },
     );
   }
