@@ -465,7 +465,7 @@ class _DetailScreenState extends State<DetailScreen> {
       } catch (_) {}
     } else {
       _decodedSinglePhoto = null;
-      testsf.vfgsh
+      testsf.vfgshWVR V
     }
   }
 }
